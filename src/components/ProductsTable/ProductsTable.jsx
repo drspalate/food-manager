@@ -34,6 +34,7 @@ import {
 import React, { useEffect, useState } from 'react';
 import {
   deleteProduct,
+  deleteProductIngredient,
   getAllIngredients,
   getAllProducts,
   getAllSpecifications,
@@ -140,7 +141,33 @@ const ProductsTable = () => {
       const savedProduct = await saveProduct(productData);
       console.log('Product saved:', savedProduct);
 
-      // Save ingredients
+      // Get current ingredient IDs from the form
+      const currentIngredientIds = formState.ingredients
+        .map((ing) => ing.id)
+        .filter(Boolean); // Remove undefined IDs (new ingredients)
+
+      // Find ingredients that were removed (exist in editingProduct but not in formState)
+      const removedIngredients =
+        editingProduct?.ingredients?.filter(
+          (ing) => !currentIngredientIds.includes(ing.id)
+        ) || [];
+
+      // Delete removed ingredients
+      await Promise.all(
+        removedIngredients.map(async (ingredient) => {
+          console.log('Deleting removed ingredient:', ingredient);
+          try {
+            // Assuming there's a deleteProductIngredient API function
+            await deleteProductIngredient(ingredient.id);
+            console.log('Successfully deleted ingredient:', ingredient.id);
+          } catch (error) {
+            console.error('Error deleting ingredient:', ingredient.id, error);
+            throw error;
+          }
+        })
+      );
+
+      // Save/update current ingredients
       console.log('Saving ingredients:', formState.ingredients);
       const savedIngredients = await Promise.all(
         formState.ingredients.map(async (ingredient, index) => {
@@ -157,11 +184,11 @@ const ProductsTable = () => {
             return savedIngredient;
           } catch (ingError) {
             console.error(`Error saving ingredient ${index + 1}:`, ingError);
-            throw ingError; // Re-throw to be caught by the outer try-catch
+            throw ingError;
           }
         })
       );
-      console.log('All ingredients saved:', savedIngredients);
+      console.log('All ingredients processed:', savedIngredients);
 
       // Reload data
       console.log('Reloading data...');
@@ -319,7 +346,7 @@ const ProductsTable = () => {
                     </TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell style={{ padding: 0 }} colSpan={7}>
+                    <TableCell style={{ padding: 0 }} colSpan={15}>
                       <Collapse in={isExpanded} timeout="auto" unmountOnExit>
                         <Box
                           sx={{ p: 2, backgroundColor: 'background.default' }}
