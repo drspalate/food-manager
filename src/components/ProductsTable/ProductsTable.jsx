@@ -7,6 +7,7 @@ import {
   ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material';
 import {
+  Autocomplete,
   Box,
   Button,
   Collapse,
@@ -437,25 +438,38 @@ const ProductsTable = () => {
                   sx={{ display: 'flex', gap: 2, alignItems: 'center' }}
                 >
                   <FormControl fullWidth margin="normal" required>
-                    <InputLabel>Ingredient</InputLabel>
-                    <Select
-                      value={ingredient.ingredientId || ''}
-                      onChange={(e) =>
+                    <Autocomplete
+                      value={
+                        ingredients.find(
+                          (i) => i.id === ingredient.ingredientId
+                        ) || null
+                      }
+                      onChange={(_, newValue) =>
                         handleIngredientChange(
                           index,
                           'ingredientId',
-                          e.target.value
+                          newValue?.id || ''
                         )
                       }
-                      label="Ingredient"
-                      required
-                    >
-                      {ingredients.map((ing) => (
-                        <MenuItem key={ing.id} value={ing.id}>
-                          {ing.ingredient}
-                        </MenuItem>
-                      ))}
-                    </Select>
+                      options={ingredients}
+                      getOptionLabel={(option) =>
+                        option?.ingredient || option?.name || ''
+                      }
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Ingredient"
+                          variant="outlined"
+                          required
+                        />
+                      )}
+                      isOptionEqualToValue={(option, value) =>
+                        option?.id === value?.id
+                      }
+                      renderOption={(props, option) => (
+                        <li {...props}>{option.ingredient || option.name}</li>
+                      )}
+                    />
                   </FormControl>
 
                   <TextField
