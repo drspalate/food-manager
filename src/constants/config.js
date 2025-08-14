@@ -19,10 +19,34 @@ export const specifications = [
     order: 1,
   },
   {
-    id: 'protein',
-    label: 'Protein (g)',
+    id: 'carbs',
+    label: 'Carbs',
     type: 'number',
     order: 2,
+  },
+  {
+    id: 'protein',
+    label: 'Protein',
+    type: 'number',
+    order: 3,
+  },
+  {
+    id: 'fats',
+    label: 'Fats',
+    type: 'number',
+    order: 4,
+  },
+  {
+    id: 'fiber',
+    label: 'Fiber',
+    type: 'number',
+    order: 5,
+  },
+  {
+    id: 'sodium',
+    label: 'Sodium',
+    type: 'number',
+    order: 6,
   },
   {
     id: 'cost',
