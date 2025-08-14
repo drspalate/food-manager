@@ -47,7 +47,6 @@ export const ProductIngredients = ({
 
                 return (
                   <TableCell key={spec.id} align="right">
-                    {spec.id === 'cost' ? '$' : ''}
                     {displayValue}
                   </TableCell>
                 );
