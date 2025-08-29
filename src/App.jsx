@@ -2,13 +2,16 @@ import {
   Alert,
   AppBar,
   Box,
+  Button,
   Container,
   CssBaseline,
   Snackbar,
+  Stack,
   Tab,
   Tabs,
   Typography,
 } from '@mui/material';
+import { CloudDownload, CloudUpload } from '@mui/icons-material';
 import React, { useEffect, useState } from 'react';
 import {
   addNewSpecification,
@@ -17,13 +20,14 @@ import {
   getAllSpecifications,
   saveIngredient,
 } from './utils';
+import { exportDatabase, handleImportClick } from './utils/db-import-export';
 
 import ActionMenu from './components/common/ActionMenu';
 import ColumnForm from './components/ColumnForm/ColumnForm';
 import FoodForm from './components/FoodForm/FoodForm';
 import FoodTable from './components/FoodTable/FoodTable';
-import ProductsTable from './components/ProductsTable/ProductsTable';
 import MenuTable from './components/MenuTable/MenuTable';
+import ProductsTable from './components/ProductsTable/ProductsTable';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -53,7 +57,12 @@ function a11yProps(index) {
 }
 
 function App() {
-  const [tabValue, setTabValue] = useState(0);
+  const [tabValue, setTabValue] = React.useState(0);
+  const [snackbar, setSnackbar] = React.useState({
+    open: false,
+    message: '',
+    severity: 'success',
+  });
   const [data, setData] = useState([]);
   const [columns, setColumns] = useState([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -61,14 +70,47 @@ function App() {
   const [editingItem, setEditingItem] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedRow, setSelectedRow] = useState(null);
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: '',
-    severity: 'success',
-  });
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
+  };
+
+  const handleExport = async () => {
+    try {
+      await exportDatabase();
+      setSnackbar({
+        open: true,
+        message: 'Database exported successfully!',
+        severity: 'success',
+      });
+    } catch (error) {
+      console.error('Export failed:', error);
+      setSnackbar({
+        open: true,
+        message: 'Export failed. Please try again.',
+        severity: 'error',
+      });
+    }
+  };
+
+  const handleImport = async () => {
+    try {
+      await handleImportClick();
+      setSnackbar({
+        open: true,
+        message: 'Database imported successfully!',
+        severity: 'success',
+      });
+      // Refresh the page to show the imported data
+      window.location.reload();
+    } catch (error) {
+      console.error('Import failed:', error);
+      setSnackbar({
+        open: true,
+        message: 'Import failed. Please check the file and try again.',
+        severity: 'error',
+      });
+    }
   };
 
   // Load data and columns from IndexedDB on component mount
@@ -191,19 +233,61 @@ function App() {
   return (
     <Box sx={{ flexGrow: 1, bgcolor: 'background.paper', minHeight: '100vh' }}>
       <CssBaseline />
-      <AppBar position="static" color="default">
-        <Tabs
-          value={tabValue}
-          onChange={handleTabChange}
-          indicatorColor="primary"
-          textColor="primary"
-          variant="fullWidth"
-          aria-label="food management tabs"
+      <AppBar position="static">
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
         >
-          <Tab label="Ingredients" {...a11yProps(0)} />
-          <Tab label="Products" {...a11yProps(1)} />
-          <Tab label="Menu" {...a11yProps(2)} />
-        </Tabs>
+          <Tabs
+            value={tabValue}
+            onChange={handleTabChange}
+            aria-label="food manager tabs"
+            textColor="inherit"
+            sx={{
+              '& .MuiTabs-indicator': {
+                backgroundColor: 'white',
+                height: 4,
+              },
+              '& .Mui-selected': {
+                color: 'white !important',
+                fontWeight: 'bold',
+              },
+              '& .MuiTab-root': {
+                color: 'rgba(255, 255, 255, 0.7)',
+                '&:hover': {
+                  color: 'white',
+                },
+              },
+            }}
+          >
+            <Tab label="Ingredients" {...a11yProps(0)} />
+            <Tab label="Products" {...a11yProps(1)} />
+            <Tab label="Menu" {...a11yProps(2)} />
+          </Tabs>
+          <Stack direction="row" spacing={2} sx={{ mr: 2 }}>
+            <Button
+              variant="contained"
+              color="secondary"
+              startIcon={<CloudUpload />}
+              onClick={handleImport}
+              size="small"
+            >
+              Import
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<CloudDownload />}
+              onClick={handleExport}
+              size="small"
+            >
+              Export
+            </Button>
+          </Stack>
+        </Box>
       </AppBar>
 
       <Container maxWidth="xl" sx={{ mt: 3, pb: 3 }}>
@@ -256,7 +340,7 @@ function App() {
       {/* Snackbar for notifications */}
       <Snackbar
         open={snackbar.open}
-        autoHideDuration={3000}
+        autoHideDuration={6000}
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
