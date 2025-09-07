@@ -101,7 +101,7 @@ const FoodTable = ({ data, columns, onAddItem, onAddColumn, onMenuClick }) => {
       </Box>
 
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-        <TableContainer sx={{ maxHeight: 600 }}>
+        <TableContainer>
           <Table stickyHeader>
             <TableHead>
               <TableRow>
