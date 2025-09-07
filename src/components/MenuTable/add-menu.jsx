@@ -32,7 +32,6 @@ export const AddMenu = ({
   return (
     <Dialog
       open={openDialog}
-      onClose={handleCloseDialog}
       maxWidth="sm"
       fullWidth
     >
