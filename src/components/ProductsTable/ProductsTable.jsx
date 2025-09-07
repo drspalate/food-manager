@@ -375,7 +375,6 @@ const ProductsTable = () => {
       {/* Add/Edit Product Dialog */}
       <Dialog
         open={openDialog}
-        onClose={handleCloseDialog}
         maxWidth="md"
         fullWidth
       >
