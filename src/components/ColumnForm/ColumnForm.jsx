@@ -33,7 +33,7 @@ const ColumnForm = ({ open, onClose, onSubmit }) => {
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
+    <Dialog open={open} maxWidth="xs" fullWidth>
       <form onSubmit={handleSubmit}>
         <DialogTitle>Add New Column</DialogTitle>
         <DialogContent>
