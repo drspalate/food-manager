@@ -69,7 +69,7 @@ const FoodForm = ({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} maxWidth="sm" fullWidth>
       <form onSubmit={handleSubmit}>
         <DialogTitle>{isEditing ? 'Edit Item' : 'Add New Item'}</DialogTitle>
         <DialogContent>
